@@ -128,6 +128,7 @@ static string_value_t format_strings[] =
    {DDS_FORMAT_R3G3B2,  "R3G3B2"},
    {DDS_FORMAT_A8,      "A8"},
    {DDS_FORMAT_L8,      "L8"},
+   {DDS_FORMAT_L4A4,    "L4A4"},
    {DDS_FORMAT_L8A8,    "L8A8"},
    {DDS_FORMAT_AEXP,    "AExp"},
    {DDS_FORMAT_YCOCG,   "YCoCg"},
@@ -197,6 +198,7 @@ static struct
    {DDS_FORMAT_R3G3B2,  DXGI_FORMAT_UNKNOWN,           1, 0, 0x000000e0, 0x0000001c, 0x00000003, 0x00000000},
    {DDS_FORMAT_A8,      DXGI_FORMAT_A8_UNORM,          1, 0, 0x00000000, 0x00000000, 0x00000000, 0x000000ff},
    {DDS_FORMAT_L8,      DXGI_FORMAT_R8_UNORM,          1, 0, 0x000000ff, 0x000000ff, 0x000000ff, 0x00000000},
+   {DDS_FORMAT_L4A4,    DXGI_FORMAT_UNKNOWN,           1, 1, 0x0000000f, 0x0000000f, 0x0000000f, 0x000000f0},
    {DDS_FORMAT_L8A8,    DXGI_FORMAT_UNKNOWN,           2, 1, 0x000000ff, 0x000000ff, 0x000000ff, 0x0000ff00},
    {DDS_FORMAT_AEXP,    DXGI_FORMAT_B8G8R8A8_UNORM,    4, 1, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000},
    {DDS_FORMAT_YCOCG,   DXGI_FORMAT_B8G8R8A8_UNORM,    4, 1, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000}
@@ -724,6 +726,9 @@ static void convert_pixels(unsigned char *dst, unsigned char *src,
             break;
          case DDS_FORMAT_L8:
             dst[i] = rgb_to_luminance(r, g, b);
+            break;
+         case DDS_FORMAT_L4A4:
+            dst[i] = pack_l4a4(rgb_to_luminance(r, g, b), a);
             break;
          case DDS_FORMAT_L8A8:
             dst[2 * i + 0] = rgb_to_luminance(r, g, b);

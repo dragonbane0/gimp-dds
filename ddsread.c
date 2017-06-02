@@ -238,6 +238,11 @@ GimpPDBStatusType read_dds(gchar *filename, gint32 *imageID)
                d.gimp_bpp = 2;
                type = GIMP_GRAY;
             }
+            else if(d.bpp == 1 && (hdr.pixelfmt.flags & DDPF_LUMINANCE) && (hdr.pixelfmt.flags & DDPF_ALPHAPIXELS)) //L4A4
+            {
+               d.gimp_bpp = 2;
+               type = GIMP_GRAY;
+            }
             else
             {
                d.gimp_bpp = d.bpp;
@@ -818,23 +823,43 @@ static int load_layer(FILE *fp, dds_header_t *hdr, dds_load_info_t *d,
    {
       case 1:
          if(hdr->pixelfmt.flags & DDPF_PALETTEINDEXED8)
+         {
             type = GIMP_INDEXED_IMAGE;
+         }
          else if(hdr->pixelfmt.rmask == 0xe0)
+         {
             type = GIMP_RGB_IMAGE;
+         }
          else if(hdr->pixelfmt.flags & DDPF_ALPHA)
+         {
             type = GIMP_GRAYA_IMAGE;
+         }
+         else if(hdr->pixelfmt.amask == 0xf0) //L4A4
+         {
+            type = GIMP_GRAYA_IMAGE;
+         }
          else
+         {
             type = GIMP_GRAY_IMAGE;
+         }
          break;
       case 2:
          if(hdr->pixelfmt.amask == 0xf000) //RGBA4
+         {
             type = GIMP_RGBA_IMAGE;
+         }
          else if(hdr->pixelfmt.amask == 0xff00) //L8A8
+         {    
             type = GIMP_GRAYA_IMAGE;
+         }
          else if(hdr->pixelfmt.bmask == 0x1f) //R5G6B5 or RGB5A1
+         {
             type = (hdr->pixelfmt.amask == 0x8000) ? GIMP_RGBA_IMAGE : GIMP_RGB_IMAGE;
+         }
          else //L16
+         {
             type = GIMP_GRAY_IMAGE;
+         }
          break;
       case 3: type = GIMP_RGB_IMAGE;   break;
       case 4: type = GIMP_RGBA_IMAGE;  break;
@@ -961,7 +986,7 @@ static int load_layer(FILE *fp, dds_header_t *hdr, dds_load_info_t *d,
                      (pixel >> d->bshift << (8 - d->bbits) & d->bmask) * 255 / d->bmask;
                   pixels[pos + 3] =
                      (pixel >> d->ashift << (8 - d->abits) & d->amask) * 255 / d->amask;
-               }
+               }         
                else if(hdr->pixelfmt.amask == 0xff00) //L8A8
                {
                   pixels[pos] =
@@ -984,7 +1009,9 @@ static int load_layer(FILE *fp, dds_header_t *hdr, dds_load_info_t *d,
                   }
                }
                else //L16
+               {
                   pixels[pos] = (unsigned char)(255 * ((float)(pixel & 0xffff) / 65535.0f));
+               }
             }
             else
             {
@@ -1005,6 +1032,13 @@ static int load_layer(FILE *fp, dds_header_t *hdr, dds_load_info_t *d,
                {
                   pixels[pos + 0] = 255;
                   pixels[pos + 1] = pixel & 0xff;
+               }
+               else if(hdr->pixelfmt.amask == 0xf0) //L4A4
+               {
+                  pixels[pos] =
+                     (pixel >> d->rshift << (8 - d->rbits) & d->rmask) * 255 / d->rmask;
+                  pixels[pos + 1] =
+                     (pixel >> d->ashift << (8 - d->abits) & d->amask) * 255 / d->amask;
                }
                else // LUMINANCE
                {

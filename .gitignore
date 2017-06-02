@@ -3,3 +3,11 @@
 ################################################################################
 
 /.vs/Gimp-DDS/v14
+*.exe
+*.o
+*.db
+*.vcxproj
+*.filters
+*.sln
+*.opendb
+/Makefile.Windows

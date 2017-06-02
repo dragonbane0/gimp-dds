@@ -65,6 +65,12 @@ static inline unsigned short pack_rgba4(int r, int g, int b, int a)
           (mul8bit(b, 15)      ));
 }
 
+static inline unsigned char pack_l4a4(int l, int a)
+{
+   return((mul8bit(a, 15) << 4) |
+          (mul8bit(l, 15)      ));
+}
+
 static inline unsigned short pack_rgb5a1(int r, int g, int b, int a)
 {
    return((((a >> 7) & 0x01) << 15) |

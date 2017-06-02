@@ -5,13 +5,7 @@ CC=gcc
 CFLAGS+=-pipe -O2 -g -Wall -fopenmp $(shell pkg-config --cflags gtk+-2.0 gimp-2.0)
 LDFLAGS=-fopenmp
 
-OS=$(shell uname -s)
-ifeq (,$(findstring Windows,$(OS)))
 EXT=
-else
-EXT=.exe
-endif
-
 TARGET=dds$(EXT)
 
 SRCS=color.c dds.c ddsread.c ddswrite.c dxt.c mipmap.c misc.c
@@ -48,9 +42,3 @@ ddswrite.o: ddswrite.c ddsplugin.h dds.h dxt.h endian.h imath.h mipmap.h color.h
 dxt.o: dxt.c dxt.h dxt_tables.h dds.h endian.h mipmap.h imath.h vec.h
 mipmap.o: mipmap.c mipmap.h dds.h imath.h
 misc.o: misc.c misc.h
-
-ifdef WIN32
--include Makefile.mingw32
-else ifdef WIN64
--include Makefile.mingw64
-endif
