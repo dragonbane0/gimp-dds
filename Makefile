@@ -5,7 +5,13 @@ CC=gcc
 CFLAGS+=-pipe -O2 -g -Wall -fopenmp $(shell pkg-config --cflags gtk+-2.0 gimp-2.0)
 LDFLAGS=-fopenmp
 
+OS=$(shell uname -s)
+ifeq (,$(findstring Windows,$(OS)))
 EXT=
+else
+EXT=.exe
+endif
+
 TARGET=dds$(EXT)
 
 SRCS=color.c dds.c ddsread.c ddswrite.c dxt.c mipmap.c misc.c
